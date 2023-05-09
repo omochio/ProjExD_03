@@ -211,15 +211,25 @@ class Explosion():
         screen.blit(self._imgs[random.randint(0, 3)], self.rct)
 
 class ScoreManager():
+    """
+    スコア管理を行うクラス
+    """
     _point = 100
 
     def __init__(self):
         self._score = 0
 
     def add_score(self):
+        """
+        スコアを加算
+        """
         self._score += __class__._point
 
     def show_score(self, screen: pg.Surface):
+        """
+        スコアを表示
+        引数1 screen: スクリーンサーフェイス
+        """
         text = pg.font.SysFont(None, 100).render(f"Score: {self._score}", True, (255, 255, 0))
         screen.blit(text, (0, 0))
 
