@@ -10,8 +10,8 @@ HEIGHT = 900  # ゲームウィンドウの高さ
 NUM_OF_BOMBS = 3  # 爆弾の初期数
 MIN_BOMB_SIZE = 10
 MAX_BOMB_SIZE = 80
-MIN_BOMB_VELOCITY = -3.0
-MAX_BOMB_VELOCITY = 3.0
+MIN_BOMB_VELOCITY = -2.0
+MAX_BOMB_VELOCITY = 2.0
 
 
 def check_bound(area: pg.Rect, obj: pg.Rect) -> tuple[bool, bool]:
@@ -141,7 +141,7 @@ class Bomb(Character):
     def update(self, screen: pg.Surface):
         """
         爆弾を速度ベクトルself._vx, self._vyに基づき移動させる
-        引数 screen：画面Surface
+        引数 screen: 画面Surface
         """
         yoko, tate = check_bound(screen.get_rect(), self._rct)
         if not yoko:
@@ -171,6 +171,46 @@ class Beam(Character):
         self._rct.move_ip(self._vx, 0)
         screen.blit(self._img, self._rct)
 
+class Explosion():
+    """
+    爆発エフェクト
+    """
+    _min_life = 500
+    _max_life = 1000
+
+    def __init__(self, xy: tuple, bframe):
+        """
+        爆発エフェクトを初期化
+        引数1 xy: 爆発位置
+        引数2 bframe: 開始フレーム数
+        """
+        self.bframe = bframe
+        img = pg.image.load("ex03/fig/explosion.gif")
+        # 爆発パターン
+        self._imgs = [
+            img, 
+            pg.transform.flip(img, True, False),
+            pg.transform.flip(img, False, True),
+            pg.transform.flip(img, True, True)]
+        self._life = random.randint(__class__._min_life, __class__._max_life)
+        self.rct = img.get_rect()
+        self.rct.center = xy
+
+    def is_playing(self, cframe: float) -> bool:
+        """
+        再生中かのboolを返す
+        引数1 cframe: 現在フレーム数
+        """
+        # print((cframe - self.bframe) / pg.time.get_ticks())
+        print(cframe - self.bframe)
+        return (cframe - self.bframe < self._life)
+
+    def update(self, screen: pg.Surface):
+        """
+        爆発エフェクトを更新する
+        引数1 screen: 画面Surface
+        """
+        screen.blit(self._imgs[random.randint(0, 3)], self.rct)
 
 
 
@@ -182,6 +222,7 @@ def main():
 
     bird = Bird(3, (900, 400))
     bombs = [Bomb((random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)), random.randint(MIN_BOMB_SIZE, MAX_BOMB_SIZE)) for i in range(NUM_OF_BOMBS)]
+    explosions = []
     beam = None
 
     tmr = 0
@@ -216,7 +257,16 @@ def main():
                 if (check_collide(beam, bomb)):
                     bird.change_img(6, screen)
                     beam = None
+                    explosions.append(Explosion(bomb.get_rct().center, tmr))
                     bombs.pop(i)
+
+        if (len(explosions) > 0):
+            for i, exp in enumerate(explosions):
+                if (exp.is_playing(tmr)):
+                    exp.update(screen)
+                else:
+                    explosions.pop(i)
+
         pg.display.update()
         clock.tick(1000)
 
