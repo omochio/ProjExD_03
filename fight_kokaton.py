@@ -214,7 +214,7 @@ class ScoreManager():
     """
     スコア管理を行うクラス
     """
-    _point = 100
+    _point = 100  # 加算されるスコアの値
 
     def __init__(self):
         self._score = 0
