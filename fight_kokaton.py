@@ -184,6 +184,7 @@ def main():
         if (beam is not None and bomb is not None):
             beam.update(screen)
             if (check_collide(beam, bomb)):
+                bird.change_img(6, screen)
                 beam = None
                 bomb = None
         pg.display.update()
