@@ -10,8 +10,8 @@ HEIGHT = 900  # ゲームウィンドウの高さ
 NUM_OF_BOMBS = 3  # 爆弾の初期数
 MIN_BOMB_SIZE = 10
 MAX_BOMB_SIZE = 80
-MIN_BOMB_VELOCITY = -2.0
-MAX_BOMB_VELOCITY = 2.0
+MIN_BOMB_VELOCITY = -2
+MAX_BOMB_VELOCITY = 2
 
 
 def check_bound(area: pg.Rect, obj: pg.Rect) -> tuple[bool, bool]:
@@ -136,7 +136,7 @@ class Bomb(Character):
         self._img.set_colorkey((0, 0, 0))
         self._rct = self._img.get_rect()
         self._rct.center = random.randint(0, WIDTH), random.randint(0, HEIGHT)
-        self._vx, self._vy = random.uniform(MIN_BOMB_VELOCITY, MAX_BOMB_VELOCITY), random.uniform(MIN_BOMB_VELOCITY, MAX_BOMB_VELOCITY)
+        self._vx, self._vy = random.randint(MIN_BOMB_VELOCITY, MAX_BOMB_VELOCITY), random.randint(MIN_BOMB_VELOCITY, MAX_BOMB_VELOCITY)
 
     def update(self, screen: pg.Surface):
         """
