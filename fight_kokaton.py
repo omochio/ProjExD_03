@@ -7,6 +7,11 @@ import pygame as pg
 
 WIDTH = 1600  # ゲームウィンドウの幅
 HEIGHT = 900  # ゲームウィンドウの高さ
+NUM_OF_BOMBS = 3  # 爆弾の初期数
+MIN_BOMB_SIZE = 10
+MAX_BOMB_SIZE = 80
+MIN_BOMB_VELOCITY = -3.0
+MAX_BOMB_VELOCITY = 3.0
 
 
 def check_bound(area: pg.Rect, obj: pg.Rect) -> tuple[bool, bool]:
@@ -131,7 +136,7 @@ class Bomb(Character):
         self._img.set_colorkey((0, 0, 0))
         self._rct = self._img.get_rect()
         self._rct.center = random.randint(0, WIDTH), random.randint(0, HEIGHT)
-        self._vx, self._vy = +1, +1
+        self._vx, self._vy = random.uniform(MIN_BOMB_VELOCITY, MAX_BOMB_VELOCITY), random.uniform(MIN_BOMB_VELOCITY, MAX_BOMB_VELOCITY)
 
     def update(self, screen: pg.Surface):
         """
@@ -176,7 +181,7 @@ def main():
     bg_img = pg.image.load("ex03/fig/pg_bg.jpg")
 
     bird = Bird(3, (900, 400))
-    bomb = Bomb((255, 0, 0), 10)
+    bombs = [Bomb((random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)), random.randint(MIN_BOMB_SIZE, MAX_BOMB_SIZE)) for i in range(NUM_OF_BOMBS)]
     beam = None
 
     tmr = 0
@@ -187,10 +192,13 @@ def main():
             if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
                 beam = Beam(bird)
 
+        if (len(bombs) <= 0):
+            return
+
         tmr += 1
         screen.blit(bg_img, [0, 0])
         
-        if (bomb is not None):
+        for bomb in bombs:
             if check_collide(bird, bomb):
                 # ゲームオーバー時に，こうかとん画像を切り替え，1秒間表示させる
                 bird.change_img(8, screen)
@@ -201,14 +209,14 @@ def main():
         key_lst = pg.key.get_pressed()
         
         bird.update(key_lst, screen)
-        if (bomb is not None):
+        for i, bomb in enumerate(bombs):
             bomb.update(screen)
-        if (beam is not None and bomb is not None):
-            beam.update(screen)
-            if (check_collide(beam, bomb)):
-                bird.change_img(6, screen)
-                beam = None
-                bomb = None
+            if (beam is not None):
+                beam.update(screen)
+                if (check_collide(beam, bomb)):
+                    bird.change_img(6, screen)
+                    beam = None
+                    bombs.pop(i)
         pg.display.update()
         clock.tick(1000)
 
