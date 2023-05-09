@@ -201,8 +201,6 @@ class Explosion():
         再生中かのboolを返す
         引数1 cframe: 現在フレーム数
         """
-        # print((cframe - self.bframe) / pg.time.get_ticks())
-        print(cframe - self.bframe)
         return (cframe - self.bframe < self._life)
 
     def update(self, screen: pg.Surface):
@@ -212,6 +210,18 @@ class Explosion():
         """
         screen.blit(self._imgs[random.randint(0, 3)], self.rct)
 
+class ScoreManager():
+    _point = 100
+
+    def __init__(self):
+        self._score = 0
+
+    def add_score(self):
+        self._score += __class__._point
+
+    def show_score(self, screen: pg.Surface):
+        text = pg.font.SysFont(None, 100).render(f"Score: {self._score}", True, (255, 255, 0))
+        screen.blit(text, (0, 0))
 
 
 def main():
@@ -224,6 +234,7 @@ def main():
     bombs = [Bomb((random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)), random.randint(MIN_BOMB_SIZE, MAX_BOMB_SIZE)) for i in range(NUM_OF_BOMBS)]
     explosions = []
     beam = None
+    sm = ScoreManager()
 
     tmr = 0
     while True:
@@ -258,6 +269,7 @@ def main():
                     bird.change_img(6, screen)
                     beam = None
                     explosions.append(Explosion(bomb.get_rct().center, tmr))
+                    sm.add_score()
                     bombs.pop(i)
 
         if (len(explosions) > 0):
@@ -266,6 +278,8 @@ def main():
                     exp.update(screen)
                 else:
                     explosions.pop(i)
+
+        sm.show_score(screen)
 
         pg.display.update()
         clock.tick(1000)
