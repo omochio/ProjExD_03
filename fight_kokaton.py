@@ -23,8 +23,26 @@ def check_bound(area: pg.Rect, obj: pg.Rect) -> tuple[bool, bool]:
         tate = False
     return yoko, tate
 
+class Character:
+    """
+    ゲームキャラクターの基底クラス
+    """
+    def get_rct(self) -> pg.Rect:
+        """
+        rectを返す
+        """
+        return self._rct
 
-class Bird:
+def check_collide(c1: Character, c2: Character) -> bool:
+    """
+    キャラクターの衝突判定を行う
+    引数1 c1: キャラクター1
+    引数2 c2: キャラクター2
+    戻り値: 衝突判定の真理値
+    """
+    return c1.get_rct().colliderect(c2.get_rct())
+
+class Bird(Character):
     """
     ゲームキャラクター（こうかとん）に関するクラス
     """
@@ -77,7 +95,7 @@ class Bird:
         screen.blit(self._img, self._rct)
 
 
-class Bomb:
+class Bomb(Character):
     """
     爆弾に関するクラス
     """
@@ -125,7 +143,7 @@ def main():
         tmr += 1
         screen.blit(bg_img, [0, 0])
         
-        if bird._rct.colliderect(bomb._rct):
+        if check_collide(bird, bomb):
             # ゲームオーバー時に，こうかとん画像を切り替え，1秒間表示させる
             bird.change_img(8, screen)
             pg.display.update()
