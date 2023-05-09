@@ -69,6 +69,20 @@ class Bird(Character):
         )
         self._rct = self._img.get_rect()
         self._rct.center = xy
+        # 回転画像選択用辞書
+        self.rot_dict = {
+            (0, 0): self._img,
+            (0, -1): pg.transform.rotozoom(self._img, 90, 1),
+            (1, -1): pg.transform.rotozoom(self._img, 45, 1),
+            (1, 0): self._img,
+            (1, 1): pg.transform.rotozoom(self._img, -45, 1),
+            (0, 1): pg.transform.rotozoom(self._img, -90, 1),
+            (-1, 1): pg.transform.rotozoom(pg.transform.flip(self._img, True, False), 45, 1),
+            (-1, 0): pg.transform.flip(self._img, True, False),
+            (-1, -1): pg.transform.rotozoom(pg.transform.flip(self._img, True, False), -45, 1)
+        }
+
+
 
     def change_img(self, num: int, screen: pg.Surface):
         """
@@ -85,9 +99,17 @@ class Bird(Character):
         引数1 key_lst：押下キーの真理値リスト
         引数2 screen：画面Surface
         """
+
+        # 軸ごとの速度を保持
+        bird_vel = [0, 0]
         for k, mv in __class__._delta.items():
             if key_lst[k]:
                 self._rct.move_ip(mv)
+                bird_vel[0] += mv[0]
+                bird_vel[1] += mv[1]
+        # 速度に応じて回転
+        self._img = self.rot_dict[tuple(bird_vel)]
+
         if check_bound(screen.get_rect(), self._rct) != (True, True):
             for k, mv in __class__._delta.items():
                 if key_lst[k]:
