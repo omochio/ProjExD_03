@@ -76,7 +76,6 @@ class Bird(Character):
         self._rct.center = xy
         # 回転画像選択用辞書
         self.rot_dict = {
-            (0, 0): self._img,
             (0, -1): pg.transform.rotozoom(self._img, 90, 1),
             (1, -1): pg.transform.rotozoom(self._img, 45, 1),
             (1, 0): self._img,
@@ -113,7 +112,8 @@ class Bird(Character):
                 bird_vel[0] += mv[0]
                 bird_vel[1] += mv[1]
         # 速度に応じて回転
-        self._img = self.rot_dict[tuple(bird_vel)]
+        if (not bird_vel == [0, 0]):
+            self._img = self.rot_dict[tuple(bird_vel)]
 
         if check_bound(screen.get_rect(), self._rct) != (True, True):
             for k, mv in __class__._delta.items():
